@@ -13,7 +13,7 @@ sound.src = './assets/sound.mp3';
 var chickens = [];
 var eggs = [];
 var frames = 0;
-const population = 50;
+const population = 1;
 
 document.addEventListener("keypress", (e) => {
 
@@ -24,19 +24,18 @@ document.addEventListener("keypress", (e) => {
                 chickens.push(createChicken());
             }
             break;
-        // case "a":
-        //     chickens[0].positionX -= 10;
-        //     break;
-        // case "d":
-        //     chickens[0].positionX += 10;
-        //     break;
-        // case "w":
-        //     chickens[0].positionY -= 10;
-        //     break;
-        // case "s":
-        //     chickens[0].positionY += 10;
-        //     break;
-
+        case 'd': //direita
+            move(chickens[0], spritesPositions[0]);
+            break;
+        case 'a': //esquerda 
+            move(chickens[0], spritesPositions[1]);
+            break;
+        case 'w': //cima
+            move(chickens[0], spritesPositions[2]);
+            break;
+        case 's': //baixo
+            move(chickens[0], spritesPositions[3]);
+            break;
     }
 });
 
@@ -105,6 +104,52 @@ function drawEgg() {
             12, 12,
         );
     });
+}
+
+function move(chicken, spritePositions) {
+
+    let colided = colide(chicken);
+
+    if (colided) return;
+
+    if (chicken.direction != spritePositions.direction) {
+        chicken.spritX = spritePositions.spritX;
+        chicken.spritY = spritePositions.spritY;
+        chicken.direction = spritePositions.direction;
+    }
+
+    //move pernas
+    chicken.spritX += chicken.size;
+
+    //anda x passos
+    if (chicken.direction == "Right") {
+        chicken.positionX += chicken.speed;
+    } else if (chicken.direction == "Left") {
+        chicken.positionX -= chicken.speed;
+    } else if (chicken.direction == "Up") {
+        chicken.positionY -= chicken.speed;
+    } else if (chicken.direction == "Down") {
+        chicken.positionY += chicken.speed;
+    }
+
+    if (chicken.spritX >= (chicken.size * 3)) {
+        chicken.spritX = 0;
+    }
+
+}
+
+function colide(chicken) {
+    var space = 10;
+    if (
+        ((chicken.positionX + chicken.size) >= canvas.width - space) ||
+        (chicken.positionX <= space) ||
+        ((chicken.positionY + chicken.size) >= canvas.height - space) ||
+        (chicken.positionY <= space)
+    ) {
+        return true;
+        console.log('bateu')
+    }
+    return false;
 }
 
 function moveChickens() {
@@ -192,7 +237,7 @@ function loop() {
 
     // drawEgg();
     drawChicken();
-    moveChickens();
+    // moveChickens();
 
     requestAnimationFrame(loop);
 
