@@ -9,7 +9,7 @@ const io = new Server(server);
 app.use(express.static(__dirname + '/src'));
 
 app.get('/', function (req, res) {
-    res.sendfile(__dirname + '/src/index.html');
+    res.sendFile(__dirname + '/src/index.html');
 });
 
 const storage = [];
@@ -45,4 +45,5 @@ io.on('connection', (socket) => {
 
 });
 
-server.listen(3000);
+const PORT = process.env.PORT || 3000;
+server.listen(PORT);
