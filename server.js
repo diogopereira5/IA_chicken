@@ -26,7 +26,6 @@ io.on('connection', (socket) => {
     });
 
     socket.on('create-chicken', (chicken) => {
-        console.log(chicken);
         storage.push(chicken);
         io.emit('draw', storage);
     })

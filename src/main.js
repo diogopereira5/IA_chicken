@@ -1,5 +1,8 @@
 const socket = io();
 
+let foo = prompt('Informe seu nome');
+const name = foo;
+
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
@@ -29,13 +32,13 @@ document.addEventListener("keypress", (e) => {
 
     try {
         switch (e.key) {
-            case " ":
-                if (keyPLayer != false) break;
-                // for (let i = 0; i < population; i++) {
-                //     chickens.push(createChicken());
-                // }
-                socket.emit('create-chicken', createChicken());
-                break;
+            // case " ":
+            //     if (keyPLayer != false) break;
+            //     // for (let i = 0; i < population; i++) {
+            //     //     chickens.push(createChicken());
+            //     // }
+            //     socket.emit('create-chicken', createChicken());
+            //     break;
             case 'd': //direita
                 move(chickens[positionPlayer], spritesPositions[0]);
                 break;
@@ -92,6 +95,7 @@ function createChicken() {
         speed,
         laidEgg: false,
         id: keyPLayer,
+        name,
     };
 
     return chicken;
@@ -99,7 +103,7 @@ function createChicken() {
 
 function drawChicken() {
 
-    chickens && chickens.map(({ spritX, spritY, sourceSize, positionX, positionY, size }) => {
+    chickens && chickens.map(({ name, spritX, spritY, sourceSize, positionX, positionY, size }) => {
         context.drawImage(
             sprites,
             spritX, spritY,
@@ -107,7 +111,13 @@ function drawChicken() {
             positionX, positionY,
             size, size,
         );
+        context.textAlign = "center";
+        context.font = "8px";
+        context.fillStyle = 'white';
+        context.fillText(name, positionX + (size / 2), positionY + (size + 10));
     });
+
+
 
 }
 
@@ -265,7 +275,6 @@ function loop() {
 }
 
 socket.on('connect', async () => {
-    console.log(socket.id);
     keyPLayer = socket.id;
     socket.emit('create-chicken', createChicken());
 });
