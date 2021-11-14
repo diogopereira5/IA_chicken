@@ -8,6 +8,10 @@ const io = new Server(server);
 
 app.use(express.static(__dirname + '/src'));
 
+app.get('/', function (req, res) {
+    res.sendfile(__dirname + '/src/index.html');
+});
+
 const storage = [];
 
 io.on('connection', (socket) => {
