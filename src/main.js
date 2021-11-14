@@ -1,3 +1,5 @@
+const socket = io();
+
 const canvas = document.getElementById("canvas");
 const context = canvas.getContext("2d");
 
@@ -10,33 +12,44 @@ eggImg.src = './assets/egg.png';
 const sound = new Audio();
 sound.src = './assets/sound.mp3';
 
+var keyPLayer = false;
 var chickens = [];
 var eggs = [];
 var frames = 0;
 const population = 1;
+var positionPlayer = null;
 
 document.addEventListener("keypress", (e) => {
 
-    switch (e.key) {
-        case " ":
-            if (chickens.length != 0) break;
-            for (let i = 0; i < population; i++) {
-                chickens.push(createChicken());
-            }
-            break;
-        case 'd': //direita
-            move(chickens[0], spritesPositions[0]);
-            break;
-        case 'a': //esquerda 
-            move(chickens[0], spritesPositions[1]);
-            break;
-        case 'w': //cima
-            move(chickens[0], spritesPositions[2]);
-            break;
-        case 's': //baixo
-            move(chickens[0], spritesPositions[3]);
-            break;
+    for (let i = 0; i < chickens.length; i++) {
+        if (chickens[i].id == keyPLayer) {
+            positionPlayer = i;
+        }
     }
+
+    try {
+        switch (e.key) {
+            case " ":
+                if (keyPLayer != false) break;
+                // for (let i = 0; i < population; i++) {
+                //     chickens.push(createChicken());
+                // }
+                socket.emit('create-chicken', createChicken());
+                break;
+            case 'd': //direita
+                move(chickens[positionPlayer], spritesPositions[0]);
+                break;
+            case 'a': //esquerda 
+                move(chickens[positionPlayer], spritesPositions[1]);
+                break;
+            case 'w': //cima
+                move(chickens[positionPlayer], spritesPositions[2]);
+                break;
+            case 's': //baixo
+                move(chickens[positionPlayer], spritesPositions[3]);
+                break;
+        }
+    } catch (err) { }
 });
 
 const spritesPositions = [
@@ -78,6 +91,7 @@ function createChicken() {
         positionY: Math.random() * (canvas.height - size),
         speed,
         laidEgg: false,
+        id: keyPLayer,
     };
 
     return chicken;
@@ -94,6 +108,7 @@ function drawChicken() {
             size, size,
         );
     });
+
 }
 
 function drawEgg() {
@@ -135,6 +150,8 @@ function move(chicken, spritePositions) {
     if (chicken.spritX >= (chicken.size * 3)) {
         chicken.spritX = 0;
     }
+
+    socket.emit('update-chickens', chicken);
 
 }
 
@@ -233,6 +250,10 @@ function moveChickens() {
 
 function loop() {
 
+    socket.on('draw', (chicken) => {
+        chickens = chicken;
+    });
+
     context.clearRect(0, 0, canvas.width, canvas.height)
 
     // drawEgg();
@@ -242,5 +263,11 @@ function loop() {
     requestAnimationFrame(loop);
 
 }
+
+socket.on('connect', async () => {
+    console.log(socket.id);
+    keyPLayer = socket.id;
+    socket.emit('create-chicken', createChicken());
+});
 
 loop();
